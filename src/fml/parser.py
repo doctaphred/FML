@@ -19,6 +19,13 @@ class Lexer:
     Traceback (most recent call last):
       ...
     StopIteration
+
+    >>> for token in Lexer(r'"\"" "\\" "\x20"'): print(token)
+    Token(kind='quoted', value='"', chars='"\\""')
+    Token(kind='space', value=' ', chars=' ')
+    Token(kind='quoted', value='\\', chars='"\\\\"')
+    Token(kind='space', value=' ', chars=' ')
+    Token(kind='quoted', value=' ', chars='"\\x20"')
     """
     state = None
 
@@ -58,6 +65,9 @@ class Lexer:
 
     def insert(self, char):
         self.value.append(char)
+
+    def __iter__(self):
+        return self
 
     def __next__(self):
         self.kind = None
@@ -127,19 +137,33 @@ class Lexer:
         self.discard()  # Don't include the escape character.
         char = self.take()
         if char in self.simple_escapes:
-            value = self.simple_escapes[char]
+            self.insert(self.simple_escapes[char])
         elif char == 'o':
-            code = self.take() + self.take()
-            point = int(code, base=8)
-            value = chr(point)
+            self.number(base=8, digits=2)
         elif char == 'x':
-            code = self.take() + self.take()
-            point = int(code, base=16)
-            value = chr(point)
+            self.number(base=16, digits=2)
         else:
             print(f"warning: {char!r} is not an escape sequence")
-            value = char
-        self.insert(value)
+            self.accept()
+
+    valid_digits = {
+        2: '01',
+        8: '01234567',
+        10: '0123456789',
+        16: '0123456789abcdefABCDEF'
+    }
+
+    def number(self, base, digits):
+        chars = []
+        for _ in range(digits):
+            char = self.take()
+            if char not in self.valid_digits[base]:
+                self.reject(f"{char!r} is not a valid base-{base} digit")
+            chars.append(char)
+        number = ''.join(chars)
+        value = int(number, base=base)
+        char = chr(value)
+        self.insert(char)
 
     def unquoted(self):
         assert self.next not in '\n \t"'
