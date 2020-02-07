@@ -38,6 +38,7 @@ class Lexer:
         # Don't touch this directly: use take/discard/accept
         self._stream = iter(stream)
         self.next = next(self._stream, None)
+        self.position = 1
 
         self.prev = None
         self.kind = None
@@ -57,6 +58,7 @@ class Lexer:
             raise StopIteration
         self.chars.append(char)
         self.next = next(self._stream, None)
+        self.position += 1
         return char
 
     def discard(self):
