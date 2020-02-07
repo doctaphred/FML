@@ -1,0 +1,10 @@
+# Requirements for developing this project.
+
+-r build.in
+
+iPython
+ipython-autotime
+pdbpp
+pip-tools
+pp-ez
+pprintpp

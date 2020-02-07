@@ -1,0 +1,7 @@
+# Requirements for building this project.
+
+-r main.in
+
+flake8
+pytest
+tox
