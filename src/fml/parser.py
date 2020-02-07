@@ -26,6 +26,11 @@ class Lexer:
     Token(kind='quoted', value='\\', chars='"\\\\"')
     Token(kind='space', value=' ', chars=' ')
     Token(kind='quoted', value=' ', chars='"\\x20"')
+
+    >>> list(Lexer(""))
+    []
+    >>> list(Lexer(" "))
+    [Token(kind='space', value=' ', chars=' ')]
     """
     state = None
 
@@ -101,7 +106,7 @@ class Lexer:
 
     def space(self):
         assert self.next in ' \t'
-        while self.next in ' \t':
+        while self.next in set(' \t'):
             self.accept()
 
     def quoted(self):
