@@ -39,6 +39,8 @@ class Lexer:
         self._stream = iter(stream)
         self.next = next(self._stream, None)
         self.position = 1
+        self.line = 1
+        self.column = 0
 
         self.prev = None
         self.kind = None
@@ -59,6 +61,11 @@ class Lexer:
         self.chars.append(char)
         self.next = next(self._stream, None)
         self.position += 1
+        if char == '\n':
+            self.line += 1
+            self.column = 0
+        else:
+            self.column += 1
         return char
 
     def discard(self):
