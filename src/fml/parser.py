@@ -5,6 +5,21 @@ Token = namedtuple('Token', ['kind', 'value', 'chars'])
 
 
 class Lexer:
+    r"""
+    >>> L = Lexer('ayy\n "lmao"')
+    >>> next(L)
+    Token(kind='unquoted', value='ayy', chars='ayy')
+    >>> next(L)
+    Token(kind='newline', value='\n', chars='\n')
+    >>> next(L)
+    Token(kind='space', value=' ', chars=' ')
+    >>> next(L)
+    Token(kind='quoted', value='lmao', chars='"lmao"')
+    >>> next(L)
+    Traceback (most recent call last):
+      ...
+    StopIteration
+    """
     state = None
 
     def __init__(self, stream):
