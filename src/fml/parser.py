@@ -79,18 +79,13 @@ class Lexer:
         self.value.clear()
         self.chars.clear()
 
-        char = self.next
-        if char is None:
+        if self.next is None:
             raise StopIteration
-        elif char == '\n':
+        elif self.next == '\n':
             self.kind = 'newline'
-        elif char in ' \t':
+        elif self.next in ' \t':
             self.kind = 'space'
-            # if self.kind is None or self.kind == 'newline':
-            #     self.kind = 'indentation'
-            # else:
-            #     self.kind = 'space'
-        elif char == '"':
+        elif self.next == '"':
             self.kind = 'quoted'
         else:
             self.kind = 'unquoted'
@@ -105,7 +100,7 @@ class Lexer:
         self.accept()
 
     def space(self):
-        assert self.next in ' \t'
+        assert self.next in set(' \t')
         while self.next in set(' \t'):
             self.accept()
 
@@ -113,14 +108,13 @@ class Lexer:
         assert self.next == '"'
         self.discard()  # Don't include the opening quote.
         while True:
-            char = self.next
-            if char is None:
+            if self.next is None:
                 self.reject(
                     f"unterminated quoted text: {''.join(self.chars)!r}")
-            elif char == '"':
+            elif self.next == '"':
                 self.discard()  # Don't include the closing quote.
                 break
-            elif char == '\\':
+            elif self.next == '\\':
                 self.quoted_escaped()
             else:
                 self.accept()
@@ -171,14 +165,13 @@ class Lexer:
         self.insert(char)
 
     def unquoted(self):
-        assert self.next not in '\n \t"'
+        assert self.next not in set('\n \t"')
         while True:
-            char = self.next
-            if char is None:
+            if self.next is None:
                 break
-            elif char == '"':
+            elif self.next == '"':
                 self.reject("quotes must be preceded by whitespace")
-            elif char in '\n \t':
+            elif self.next in '\n \t':
                 break
             else:
                 self.accept()
